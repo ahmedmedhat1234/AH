@@ -19,9 +19,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -32,7 +33,7 @@
           <span class="brand-title">أبو حويل للنجف</span>
         </div>
         <nav class="nav-links">
-          <a href="#home">الرئيسية </a>
+          <a href="#home">الرئيسية</a>
           <a href="#models">الموديلات</a>
           <a href="#about">من نحن</a>
           <a href="#contact">تواصل</a>
@@ -43,7 +44,9 @@
             href="https://wa.me/201202395265"
             target="_blank"
             rel="noopener"
+            aria-label="واتساب"
           >
+            <i class="fab fa-whatsapp"></i>
             طلب على واتساب
           </a>
           <a
@@ -53,6 +56,7 @@
             rel="noopener"
             aria-label="صفحة فيسبوك"
           >
+            <i class="fab fa-facebook"></i>
             فيسبوك
           </a>
         </div>
@@ -71,6 +75,7 @@
           <div class="hero-actions">
             <a class="btn btn-primary" href="#models">تصفح الأسعار</a>
             <a class="btn btn-outline" href="https://wa.me/201202395265" target="_blank" rel="noopener">
+              <i class="fab fa-whatsapp"></i>
               اطلب الآن
             </a>
           </div>
@@ -80,16 +85,16 @@
       <section class="features">
         <div class="container features-grid">
           <div class="feature-card">
-            <h3>خامات عالية الجودة</h3>
-            <p>اختيار دقيق للمواد لضمان اللمعان والمتانة.</p>
+            <h3>✨ خامات عالية الجودة</h3>
+            <p>اختيار دقيق للمواد لضمان اللمعان والمتانة والفخامة.</p>
           </div>
           <div class="feature-card">
-            <h3>تصميمات عصرية وكلاسيك</h3>
-            <p>تشكيلة واسعة تناسب كل الأذواق والمساحات.</p>
+            <h3>🎨 تصميمات عصرية وكلاسيك</h3>
+            <p>تشكيلة واسعة تناسب كل الأذواق والمساحات والديكورات.</p>
           </div>
           <div class="feature-card">
-            <h3>طلب سريع عبر واتساب</h3>
-            <p>استفسار فوري وتأكيد سريع بضغطة واحدة.</p>
+            <h3>⚡ طلب سريع عبر واتساب</h3>
+            <p>استفسار فوري وتأكيد سريع بضغطة واحدة فقط.</p>
           </div>
         </div>
       </section>
@@ -103,7 +108,7 @@
             </div>
             <div class="filters">
               <label class="input-group">
-                <span>بحث</span>
+                <span>🔍 بحث</span>
                 <input
                   type="search"
                   id="searchInput"
@@ -111,7 +116,7 @@
                 />
               </label>
               <label class="input-group">
-                <span>ترتيب السعر</span>
+                <span>💰 ترتيب السعر</span>
                 <select id="sortSelect">
                   <option value="default">الافتراضي</option>
                   <option value="asc">من الأقل للأعلى</option>
@@ -130,7 +135,8 @@
           <h2>من نحن</h2>
           <p>
             أبو حويل للنجف متخصصون في توفير أحدث موديلات النجف والإضاءة بخامات عالية الجودة
-            وتصميمات تناسب جميع الأذواق.
+            وتصميمات تناسب جميع الأذواق والمساحات. نحن نؤمن بأن الفخامة والجودة يجب أن تكونا في متناول الجميع.
+            مع سنوات من الخبرة، نقدم لكم أفضل الخيارات بأسعار تنافسية وخدمة عملاء ممتازة.
           </p>
         </div>
       </section>
@@ -139,20 +145,33 @@
         <div class="container contact-content">
           <div>
             <h2>تواصل معنا</h2>
-            <p>نسعد باستفساراتكم وطلباتكم عبر واتساب أو فيسبوك.</p>
+            <p>نسعد باستفساراتكم وطلباتكم عبر واتساب أو فيسبوك أو الاتصال المباشر.</p>
           </div>
           <div class="contact-actions">
             <a class="btn btn-whatsapp" href="https://wa.me/201202395265" target="_blank" rel="noopener">
+              <i class="fab fa-whatsapp"></i>
               واتساب مباشر
             </a>
             <div class="contact-info">
-              <span>رقم واتساب: <strong>+20 12 02395265</strong></span>
+              <span>📱 رقم واتساب: <strong>+20 12 02395265</strong></span>
               <a
                 href="https://www.facebook.com/profile.php?id=61567349501848"
                 target="_blank"
                 rel="noopener"
               >
+                <i class="fab fa-facebook"></i>
                 رابط فيسبوك
+              </a>
+            </div>
+            <div class="social-icons">
+              <a href="https://wa.me/201202395265" target="_blank" rel="noopener" class="social-icon whatsapp" aria-label="واتساب">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+              <a href="tel:+201202395265" class="social-icon call" aria-label="اتصال مباشر">
+                <i class="fas fa-phone"></i>
+              </a>
+              <a href="https://www.facebook.com/profile.php?id=61567349501848" target="_blank" rel="noopener" class="social-icon facebook" aria-label="فيسبوك">
+                <i class="fab fa-facebook"></i>
               </a>
             </div>
           </div>
@@ -164,16 +183,24 @@
       <div class="container footer-content">
         <div>
           <h3>أبو حويل للنجف</h3>
-          <p>نجف فاخر بتصميمات تناسب كل الأذواق.</p>
+          <p>نجف فاخر بتصميمات تناسب كل الأذواق والمساحات.</p>
         </div>
         <div class="footer-links">
-          <a href="https://wa.me/201202395265" target="_blank" rel="noopener">واتساب</a>
+          <a href="https://wa.me/201202395265" target="_blank" rel="noopener">
+            <i class="fab fa-whatsapp"></i>
+            واتساب
+          </a>
           <a
             href="https://www.facebook.com/profile.php?id=61567349501848"
             target="_blank"
             rel="noopener"
           >
+            <i class="fab fa-facebook"></i>
             فيسبوك
+          </a>
+          <a href="tel:+201202395265">
+            <i class="fas fa-phone"></i>
+            اتصال
           </a>
         </div>
         <div class="footer-meta">© 2026 أبو حويل للنجف. جميع الحقوق محفوظة.</div>
@@ -190,12 +217,19 @@
         <div class="modal-details">
           <h3 id="modalTitle"></h3>
           <p class="modal-price" id="modalPrice"></p>
-          <p class="modal-desc">
+          <p class="modal-desc" id="modalDesc">
             نجفة بتصميم أنيق يناسب المساحات المختلفة، خامات ممتازة وإضاءة مريحة.
           </p>
-          <a id="modalWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
-            اطلب على واتساب
-          </a>
+          <div class="modal-actions">
+            <a id="modalWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
+              <i class="fab fa-whatsapp"></i>
+              اطلب على واتساب
+            </a>
+            <a id="modalCall" class="btn btn-call" href="tel:+201202395265" aria-label="اتصال مباشر">
+              <i class="fas fa-phone"></i>
+              اتصال مباشر
+            </a>
+          </div>
         </div>
       </div>
     </div>

@@ -5,9 +5,12 @@ const modal = document.getElementById("modelModal");
 const modalImage = document.getElementById("modalImage");
 const modalTitle = document.getElementById("modalTitle");
 const modalPrice = document.getElementById("modalPrice");
+const modalDesc = document.getElementById("modalDesc");
 const modalWhatsapp = document.getElementById("modalWhatsapp");
+const modalCall = document.getElementById("modalCall");
 
 const WHATSAPP_NUMBER = "201202395265";
+const PHONE_NUMBER = "+201202395265";
 const DEFAULT_DESCRIPTION =
   "نجفة بتصميم أنيق يناسب المساحات المختلفة، خامات ممتازة وإضاءة مريحة.";
 
@@ -32,18 +35,23 @@ const renderModels = (data) => {
     return;
   }
 
-  data.forEach((model) => {
+  data.forEach((model, index) => {
     const card = document.createElement("div");
     card.className = "model-card reveal";
+    card.style.transitionDelay = `${index * 0.05}s`;
     card.innerHTML = `
       <img src="${model.image}" alt="${model.id}" loading="lazy" />
       <div class="model-body">
         <div class="model-title">${model.id}</div>
         <div class="model-price">${model.price}</div>
         <div class="model-actions">
-          <button class="btn btn-outline" data-action="details">تفاصيل</button>
-          <a class="btn btn-whatsapp" href="${createWhatsappLink(model)}" target="_blank" rel="noopener">
-            اطلب على واتساب
+          <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">
+            <i class="fas fa-eye"></i>
+            تفاصيل
+          </button>
+          <a class="btn btn-whatsapp" href="${createWhatsappLink(model)}" target="_blank" rel="noopener" aria-label="طلب ${model.id} عبر واتساب">
+            <i class="fab fa-whatsapp"></i>
+            اطلب
           </a>
         </div>
       </div>
@@ -51,6 +59,13 @@ const renderModels = (data) => {
 
     card.querySelector('[data-action="details"]').addEventListener("click", () => {
       openModal(model);
+    });
+
+    // Make the entire card clickable to open modal
+    card.addEventListener("click", (e) => {
+      if (!e.target.closest(".model-actions")) {
+        openModal(model);
+      }
     });
 
     modelsGrid.appendChild(card);
@@ -80,15 +95,23 @@ const openModal = (model) => {
   modalImage.alt = model.id;
   modalTitle.textContent = model.id;
   modalPrice.textContent = model.price;
+  modalDesc.textContent = model.description || DEFAULT_DESCRIPTION;
   modalWhatsapp.href = createWhatsappLink(model);
+  modalCall.href = `tel:${PHONE_NUMBER}`;
   modalWhatsapp.setAttribute("aria-label", `اطلب ${model.id} عبر واتساب`);
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
+  
+  // Prevent body scroll when modal is open
+  document.body.style.overflow = "hidden";
 };
 
 const closeModal = () => {
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
+  
+  // Re-enable body scroll
+  document.body.style.overflow = "";
 };
 
 const observeReveals = () => {
@@ -108,6 +131,7 @@ const observeReveals = () => {
   revealItems.forEach((item) => observer.observe(item));
 };
 
+// Modal event listeners
 modal.addEventListener("click", (event) => {
   if (event.target.dataset.close) {
     closeModal();
@@ -123,8 +147,29 @@ window.addEventListener("keydown", (event) => {
 searchInput.addEventListener("input", applyFilters);
 sortSelect.addEventListener("change", applyFilters);
 
+// Smooth scroll behavior for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    const href = this.getAttribute('href');
+    if (href !== '#' && document.querySelector(href)) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+});
+
+// Load models from JSON
 fetch("models.json")
-  .then((response) => response.json())
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
   .then((data) => {
     models = data.map((model) => ({
       ...model,
@@ -133,7 +178,23 @@ fetch("models.json")
     filteredModels = [...models];
     renderModels(filteredModels);
   })
-  .catch(() => {
+  .catch((error) => {
+    console.error("Error loading models:", error);
     modelsGrid.innerHTML =
       '<p class="empty-state">تعذر تحميل الموديلات. الرجاء المحاولة لاحقًا.</p>';
   });
+
+// Lazy loading optimization
+if ("IntersectionObserver" in window) {
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        img.src = img.dataset.src || img.src;
+        observer.unobserve(img);
+      }
+    });
+  });
+
+  document.querySelectorAll("img[data-src]").forEach(img => imageObserver.observe(img));
+}
