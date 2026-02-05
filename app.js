@@ -40,7 +40,8 @@ const renderModels = (data) => {
     card.className = "model-card reveal";
     card.style.transitionDelay = `${index * 0.05}s`;
     const discountBadge = model.discount ? `<div class="discount-badge">خصم ${model.discount}</div>` : '';
-    const originalPriceHtml = model.originalPrice ? `<span class="original-price">${model.originalPrice}</span>` : '';
+    // If there's a discount, originalPrice is the "Old Price" and model.price is the "New Price"
+    const oldPriceHtml = model.originalPrice ? `<span class="original-price">${model.originalPrice}</span>` : '';
     
     card.innerHTML = `
       ${discountBadge}
@@ -49,7 +50,7 @@ const renderModels = (data) => {
         <div class="model-title">${model.id}</div>
         <div class="price-container">
           <div class="model-price">${model.price}</div>
-          ${originalPriceHtml}
+          ${oldPriceHtml}
         </div>
         <div class="model-actions">
           <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">

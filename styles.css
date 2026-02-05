@@ -1,17 +1,17 @@
 :root {
-  --black: #0f172a;
+  --black: #1a1a1a;
   --white: #ffffff;
-  --gold: #c5a059;
-  --dark-gold: #a38241;
+  --gold: #d4af37;
+  --dark-gold: #b8860b;
   --light-gold: #fdf2d9;
-  --grey: #f8fafc;
-  --dark-grey: #1e293b;
-  --text: #334155;
-  --light-text: #64748b;
-  --accent: #e11d48;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --shadow-luxury: 0 10px 30px rgba(197, 160, 89, 0.2);
+  --grey: #f9f9f9;
+  --dark-grey: #333333;
+  --text: #2d3436;
+  --light-text: #636e72;
+  --accent: #d63031;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --shadow-luxury: 0 10px 30px rgba(212, 175, 55, 0.15);
 }
 
 * {
@@ -51,11 +51,12 @@ a {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+  background: var(--white);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
   width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .header-content {
@@ -971,7 +972,7 @@ a {
   .header-content {
     flex-direction: row;
     justify-content: space-between;
-    padding: 0.6rem 0;
+    padding: 0.8rem 0;
     gap: 0.5rem;
   }
   .brand {
