@@ -7,7 +7,9 @@
   {
     "id": "AH-02",
     "image": "images/1 (2).jpeg",
-    "price": "899 جنيه"
+    "price": "899 جنيه",
+    "originalPrice": "1090 جنيه",
+    "discount": "22%"
   },
   {
     "id": "AH-03",

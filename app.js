@@ -39,11 +39,18 @@ const renderModels = (data) => {
     const card = document.createElement("div");
     card.className = "model-card reveal";
     card.style.transitionDelay = `${index * 0.05}s`;
+    const discountBadge = model.discount ? `<div class="discount-badge">خصم ${model.discount}</div>` : '';
+    const originalPriceHtml = model.originalPrice ? `<span class="original-price">${model.originalPrice}</span>` : '';
+    
     card.innerHTML = `
+      ${discountBadge}
       <img src="${model.image}" alt="${model.id}" loading="lazy" />
       <div class="model-body">
         <div class="model-title">${model.id}</div>
-        <div class="model-price">${model.price}</div>
+        <div class="price-container">
+          <div class="model-price">${model.price}</div>
+          ${originalPriceHtml}
+        </div>
         <div class="model-actions">
           <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">
             <i class="fas fa-eye"></i>
@@ -85,6 +92,12 @@ const applyFilters = () => {
     filteredModels.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
   } else if (sortValue === "desc") {
     filteredModels.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+  } else if (sortValue === "discount") {
+    filteredModels.sort((a, b) => {
+      const discountA = a.discount ? parseInt(a.discount) : 0;
+      const discountB = b.discount ? parseInt(b.discount) : 0;
+      return discountB - discountA;
+    });
   }
 
   renderModels(filteredModels);
@@ -94,7 +107,8 @@ const openModal = (model) => {
   modalImage.src = model.image;
   modalImage.alt = model.id;
   modalTitle.textContent = model.id;
-  modalPrice.textContent = model.price;
+  const originalPriceHtml = model.originalPrice ? `<span class="modal-original-price">${model.originalPrice}</span>` : '';
+  modalPrice.innerHTML = `${model.price} ${originalPriceHtml}`;
   modalDesc.textContent = model.description || DEFAULT_DESCRIPTION;
   modalWhatsapp.href = createWhatsappLink(model);
   modalCall.href = `tel:${PHONE_NUMBER}`;
