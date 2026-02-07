@@ -171,6 +171,10 @@ const renderModels = (data) => {
             <i class="fab fa-whatsapp"></i>
             شراء
           </button>
+          <button class="btn btn-outline" data-action="add-to-cart" aria-label="إضافة ${model.id} للسلة">
+            <i class="fas fa-cart-plus"></i>
+            أضف للسلة
+          </button>
           <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">
             <i class="fas fa-eye"></i>
             تفاصيل
@@ -182,6 +186,11 @@ const renderModels = (data) => {
     card.querySelector('[data-action="details"]').addEventListener("click", (e) => {
       e.stopPropagation();
       openModal(model);
+    });
+
+    card.querySelector('[data-action="add-to-cart"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      addToCart(model);
     });
 
     card.querySelector('[data-action="buy-now"]').addEventListener("click", (e) => {
