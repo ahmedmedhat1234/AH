@@ -49,6 +49,30 @@ const updateCartUI = () => {
   renderCart();
 };
 
+const showToast = (message) => {
+  let container = document.querySelector(".toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <i class="fas fa-check-circle"></i>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+    if (container.childNodes.length === 0) {
+      container.remove();
+    }
+  }, 3000);
+};
+
 const addToCart = (model) => {
   const existingItem = cart.find((item) => item.id === model.id);
   if (existingItem) {
@@ -62,7 +86,7 @@ const addToCart = (model) => {
     });
   }
   updateCartUI();
-  openCart();
+  showToast(`تم إضافة ${model.id} إلى السلة`);
 };
 
 const removeFromCart = (id) => {
@@ -135,11 +159,28 @@ const renderCart = () => {
 const openCart = () => {
   cartSidebar.classList.add("open");
   document.body.style.overflow = "hidden";
+  
+  // Create and show overlay for mobile
+  if (window.innerWidth <= 768) {
+    let overlay = document.querySelector(".cart-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.className = "cart-overlay";
+      document.body.appendChild(overlay);
+      overlay.addEventListener("click", closeCart);
+    }
+    overlay.classList.add("open");
+  }
 };
 
 const closeCart = () => {
   cartSidebar.classList.remove("open");
   document.body.style.overflow = "";
+  
+  const overlay = document.querySelector(".cart-overlay");
+  if (overlay) {
+    overlay.classList.remove("open");
+  }
 };
 
 const renderModels = (data) => {
