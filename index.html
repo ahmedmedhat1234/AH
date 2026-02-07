@@ -270,29 +270,33 @@
         <div class="modal-details">
           <h3>إتمام الشراء</h3>
           <form id="checkoutForm" class="checkout-form">
-            <div class="form-group">
-              <label for="userName">الاسم بالكامل *</label>
-              <input type="text" id="userName" required placeholder="أدخل اسمك بالكامل">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="userName">الاسم بالكامل *</label>
+                <input type="text" id="userName" required placeholder="أدخل اسمك بالكامل">
+              </div>
+              <div class="form-group">
+                <label for="userPhone">رقم الهاتف *</label>
+                <input type="tel" id="userPhone" required placeholder="01xxxxxxxxx">
+              </div>
             </div>
             <div class="form-group">
               <label for="userAddress">العنوان بالتفصيل *</label>
               <input type="text" id="userAddress" required placeholder="المحافظة، المدينة، الشارع">
             </div>
-            <div class="form-group">
-              <label for="userPhone">رقم الهاتف *</label>
-              <input type="tel" id="userPhone" required placeholder="01xxxxxxxxx">
-            </div>
-            <div class="form-group">
-              <label for="orderQuantity">الكمية الإجمالية *</label>
-              <input type="number" id="orderQuantity" required min="1" value="1">
-            </div>
-            <div class="form-group">
-              <label for="userPhone2">رقم هاتف إضافي (اختياري)</label>
-              <input type="tel" id="userPhone2" placeholder="رقم آخر للتواصل">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="orderQuantity">الكمية الإجمالية *</label>
+                <input type="number" id="orderQuantity" required min="1" value="1">
+              </div>
+              <div class="form-group">
+                <label for="userPhone2">هاتف إضافي</label>
+                <input type="tel" id="userPhone2" placeholder="اختياري">
+              </div>
             </div>
             <div class="form-group">
               <label for="orderNotes">ملاحظات (اختياري)</label>
-              <textarea id="orderNotes" rows="3" placeholder="أي ملاحظات إضافية عن الطلب"></textarea>
+              <textarea id="orderNotes" rows="2" placeholder="أي ملاحظات إضافية عن الطلب"></textarea>
             </div>
             <div class="order-summary" id="orderSummary">
               <!-- Order summary will be injected here -->

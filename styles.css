@@ -827,7 +827,7 @@ a {
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 3000;
+  z-index: 9999; /* تم رفع القيمة لضمان الظهور فوق الهيدر */
   padding: 1rem;
 }
 
@@ -881,14 +881,17 @@ a {
 .modal-details {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
+  width: 100%;
 }
 
 .modal-details h3 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  margin: 0;
+  margin-bottom: 0.5rem;
   color: var(--black);
+  border-bottom: 2px solid var(--light-gold);
+  padding-bottom: 0.5rem;
 }
 
 .modal-price {
@@ -1131,7 +1134,7 @@ a {
   }
 
   .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   .form-group label {
@@ -1278,8 +1281,12 @@ a {
   .modal-content {
     padding: 1.2rem;
     border-radius: 16px;
-    max-width: 100vw;
-    gap: 1.2rem;
+    width: 95%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    gap: 1rem;
+    margin-top: 20px; /* إضافة مسافة علوية لتجنب الالتصاق بالحافة */
   }
 
   .modal-content img {
@@ -1601,18 +1608,34 @@ a {
 .form-group textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--grey);
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   font-family: inherit;
+  background: #fcfcfc;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--gold);
+  outline: none;
   background: var(--white);
 }
 
 .order-summary {
-  background: var(--grey);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  background: #f8f9fa;
+  padding: 1.2rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  border: 1px dashed var(--gold);
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0;
 }
 
 .order-summary h4 {
@@ -1751,5 +1774,23 @@ a {
   .toast {
     min-width: auto;
     width: 100%;
+  }
+}
+
+/* ===== FORM LAYOUT ===== */
+.form-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
   }
 }
