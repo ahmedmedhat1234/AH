@@ -39,6 +39,10 @@
           <a href="#contact">تواصل</a>
         </nav>
         <div class="header-actions">
+          <button class="cart-toggle" id="cartToggle" aria-label="سلة المشتريات">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
           <a
             class="btn btn-whatsapp"
             href="https://wa.me/201202395265"
@@ -225,15 +229,79 @@
             نجفة بتصميم أنيق يناسب المساحات المختلفة، خامات ممتازة وإضاءة مريحة.
           </p>
           <div class="modal-actions">
+            <button id="modalAddToCart" class="btn btn-primary">
+              <i class="fas fa-cart-plus"></i>
+              إضافة للسلة
+            </button>
             <a id="modalWhatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener">
               <i class="fab fa-whatsapp"></i>
-              اطلب على واتساب
-            </a>
-            <a id="modalCall" class="btn btn-call" href="tel:+201202395265" aria-label="اتصال مباشر">
-              <i class="fas fa-phone"></i>
-              اتصال مباشر
+              شراء الآن
             </a>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+      <div class="cart-header">
+        <h3>سلة المشتريات</h3>
+        <button class="cart-close" id="cartClose">&times;</button>
+      </div>
+      <div class="cart-items" id="cartItems">
+        <!-- Cart items will be injected here -->
+      </div>
+      <div class="cart-footer">
+        <div class="cart-total">
+          <span>الإجمالي:</span>
+          <span id="cartTotalAmount">0 ج.م</span>
+        </div>
+        <button class="btn btn-primary btn-block" id="checkoutBtn">إتمام الشراء</button>
+      </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal-overlay" data-close="true"></div>
+      <div class="modal-content">
+        <button class="modal-close" type="button" data-close="true" aria-label="إغلاق">
+          ×
+        </button>
+        <div class="modal-details">
+          <h3>إتمام الشراء</h3>
+          <form id="checkoutForm" class="checkout-form">
+            <div class="form-group">
+              <label for="userName">الاسم بالكامل *</label>
+              <input type="text" id="userName" required placeholder="أدخل اسمك بالكامل">
+            </div>
+            <div class="form-group">
+              <label for="userAddress">العنوان بالتفصيل *</label>
+              <input type="text" id="userAddress" required placeholder="المحافظة، المدينة، الشارع">
+            </div>
+            <div class="form-group">
+              <label for="userPhone">رقم الهاتف *</label>
+              <input type="tel" id="userPhone" required placeholder="01xxxxxxxxx">
+            </div>
+            <div class="form-group">
+              <label for="orderQuantity">الكمية الإجمالية *</label>
+              <input type="number" id="orderQuantity" required min="1" value="1">
+            </div>
+            <div class="form-group">
+              <label for="userPhone2">رقم هاتف إضافي (اختياري)</label>
+              <input type="tel" id="userPhone2" placeholder="رقم آخر للتواصل">
+            </div>
+            <div class="form-group">
+              <label for="orderNotes">ملاحظات (اختياري)</label>
+              <textarea id="orderNotes" rows="3" placeholder="أي ملاحظات إضافية عن الطلب"></textarea>
+            </div>
+            <div class="order-summary" id="orderSummary">
+              <!-- Order summary will be injected here -->
+            </div>
+            <button type="submit" class="btn btn-whatsapp btn-block">
+              <i class="fab fa-whatsapp"></i>
+              تأكيد الطلب عبر واتساب
+            </button>
+          </form>
         </div>
       </div>
     </div>

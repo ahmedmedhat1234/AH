@@ -7,7 +7,19 @@ const modalTitle = document.getElementById("modalTitle");
 const modalPrice = document.getElementById("modalPrice");
 const modalDesc = document.getElementById("modalDesc");
 const modalWhatsapp = document.getElementById("modalWhatsapp");
-const modalCall = document.getElementById("modalCall");
+const modalAddToCart = document.getElementById("modalAddToCart");
+
+const cartSidebar = document.getElementById("cartSidebar");
+const cartToggle = document.getElementById("cartToggle");
+const cartClose = document.getElementById("cartClose");
+const cartItemsContainer = document.getElementById("cartItems");
+const cartCount = document.getElementById("cartCount");
+const cartTotalAmount = document.getElementById("cartTotalAmount");
+const checkoutBtn = document.getElementById("checkoutBtn");
+
+const checkoutModal = document.getElementById("checkoutModal");
+const checkoutForm = document.getElementById("checkoutForm");
+const orderSummary = document.getElementById("orderSummary");
 
 const WHATSAPP_NUMBER = "201202395265";
 const PHONE_NUMBER = "+201202395265";
@@ -16,6 +28,7 @@ const DEFAULT_DESCRIPTION =
 
 let models = [];
 let filteredModels = [];
+let cart = JSON.parse(localStorage.getItem("ah_cart")) || [];
 
 const parsePrice = (price) => {
   const numeric = price.replace(/[^0-9]/g, "");
@@ -25,6 +38,106 @@ const parsePrice = (price) => {
 const createWhatsappLink = (model) => {
   const message = `السلام عليكم، عايز أطلب موديل ${model.id} بسعر ${model.price}. هل متوفر؟`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+};
+
+const updateCartUI = () => {
+  localStorage.setItem("ah_cart", JSON.stringify(cart));
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  cartCount.textContent = totalItems;
+  renderCart();
+};
+
+const addToCart = (model) => {
+  const existingItem = cart.find((item) => item.id === model.id);
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({
+      id: model.id,
+      price: model.price,
+      image: model.image,
+      quantity: 1,
+    });
+  }
+  updateCartUI();
+  openCart();
+};
+
+const removeFromCart = (id) => {
+  cart = cart.filter((item) => item.id !== id);
+  updateCartUI();
+};
+
+const updateQuantity = (id, delta) => {
+  const item = cart.find((item) => item.id === id);
+  if (item) {
+    item.quantity += delta;
+    if (item.quantity <= 0) {
+      removeFromCart(id);
+    } else {
+      updateCartUI();
+    }
+  }
+};
+
+const renderCart = () => {
+  cartItemsContainer.innerHTML = "";
+  let total = 0;
+
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = '<p class="empty-state">السلة فارغة حالياً.</p>';
+    cartTotalAmount.textContent = "0 ج.م";
+    checkoutBtn.disabled = true;
+    return;
+  }
+
+  checkoutBtn.disabled = false;
+  cart.forEach((item) => {
+    const priceNum = parsePrice(item.price);
+    total += priceNum * item.quantity;
+
+    const itemEl = document.createElement("div");
+    itemEl.className = "cart-item";
+    itemEl.innerHTML = `
+      <img src="${item.image}" alt="${item.id}" class="cart-item-img" />
+      <div class="cart-item-info">
+        <div class="cart-item-title">${item.id}</div>
+        <div class="cart-item-price">${item.price}</div>
+        <div class="cart-item-actions">
+          <div class="quantity-controls">
+            <button class="qty-btn minus" data-id="${item.id}">-</button>
+            <span class="qty-val">${item.quantity}</span>
+            <button class="qty-btn plus" data-id="${item.id}">+</button>
+          </div>
+          <button class="remove-item" data-id="${item.id}">حذف</button>
+        </div>
+      </div>
+    `;
+    cartItemsContainer.appendChild(itemEl);
+  });
+
+  cartTotalAmount.textContent = `${total.toLocaleString()} ج.م`;
+
+  // Add event listeners to cart buttons
+  cartItemsContainer.querySelectorAll(".qty-btn.plus").forEach((btn) => {
+    btn.addEventListener("click", () => updateQuantity(btn.dataset.id, 1));
+  });
+  cartItemsContainer.querySelectorAll(".qty-btn.minus").forEach((btn) => {
+    btn.addEventListener("click", () => updateQuantity(btn.dataset.id, -1));
+  });
+  cartItemsContainer.querySelectorAll(".remove-item").forEach((btn) => {
+    btn.addEventListener("click", () => removeFromCart(btn.dataset.id));
+  });
+};
+
+const openCart = () => {
+  cartSidebar.classList.add("open");
+  document.body.style.overflow = "hidden";
+};
+
+const closeCart = () => {
+  cartSidebar.classList.remove("open");
+  document.body.style.overflow = "";
 };
 
 const renderModels = (data) => {
@@ -40,7 +153,6 @@ const renderModels = (data) => {
     card.className = "model-card reveal";
     card.style.transitionDelay = `${index * 0.05}s`;
     const discountBadge = model.discount ? `<div class="discount-badge">خصم ${model.discount}</div>` : '';
-    // If there's a discount, originalPrice is the "Old Price" and model.price is the "New Price"
     const oldPriceHtml = model.originalPrice ? `<span class="original-price">${model.originalPrice}</span>` : '';
     
     card.innerHTML = `
@@ -53,23 +165,28 @@ const renderModels = (data) => {
           ${oldPriceHtml}
         </div>
         <div class="model-actions">
+          <button class="btn btn-primary" data-action="add-to-cart" aria-label="إضافة ${model.id} للسلة">
+            <i class="fas fa-cart-plus"></i>
+            للسلة
+          </button>
           <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">
             <i class="fas fa-eye"></i>
             تفاصيل
           </button>
-          <a class="btn btn-whatsapp" href="${createWhatsappLink(model)}" target="_blank" rel="noopener" aria-label="طلب ${model.id} عبر واتساب">
-            <i class="fab fa-whatsapp"></i>
-            اطلب
-          </a>
         </div>
       </div>
     `;
 
-    card.querySelector('[data-action="details"]').addEventListener("click", () => {
+    card.querySelector('[data-action="details"]').addEventListener("click", (e) => {
+      e.stopPropagation();
       openModal(model);
     });
 
-    // Make the entire card clickable to open modal
+    card.querySelector('[data-action="add-to-cart"]').addEventListener("click", (e) => {
+      e.stopPropagation();
+      addToCart(model);
+    });
+
     card.addEventListener("click", (e) => {
       if (!e.target.closest(".model-actions")) {
         openModal(model);
@@ -112,21 +229,27 @@ const openModal = (model) => {
   modalPrice.innerHTML = `${model.price} ${originalPriceHtml}`;
   modalDesc.textContent = model.description || DEFAULT_DESCRIPTION;
   modalWhatsapp.href = createWhatsappLink(model);
-  modalCall.href = `tel:${PHONE_NUMBER}`;
-  modalWhatsapp.setAttribute("aria-label", `اطلب ${model.id} عبر واتساب`);
+  modalWhatsapp.setAttribute("aria-label", `شراء ${model.id} الآن عبر واتساب`);
+  
+  // Update Add to Cart button in modal
+  const newAddToCart = modalAddToCart.cloneNode(true);
+  modalAddToCart.parentNode.replaceChild(newAddToCart, modalAddToCart);
+  newAddToCart.addEventListener("click", () => {
+    addToCart(model);
+    closeModal();
+  });
+
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
-  
-  // Prevent body scroll when modal is open
   document.body.style.overflow = "hidden";
 };
 
 const closeModal = () => {
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
-  
-  // Re-enable body scroll
-  document.body.style.overflow = "";
+  if (!cartSidebar.classList.contains("open")) {
+    document.body.style.overflow = "";
+  }
 };
 
 const observeReveals = () => {
@@ -146,45 +269,112 @@ const observeReveals = () => {
   revealItems.forEach((item) => observer.observe(item));
 };
 
+// Event Listeners
+cartToggle.addEventListener("click", openCart);
+cartClose.addEventListener("click", closeCart);
+
+checkoutBtn.addEventListener("click", () => {
+  closeCart();
+  renderOrderSummary();
+  checkoutModal.classList.add("open");
+  checkoutModal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+});
+
+const renderOrderSummary = () => {
+  orderSummary.innerHTML = "<h4>ملخص الطلب</h4>";
+  let total = 0;
+  let totalQty = 0;
+  cart.forEach((item) => {
+    totalQty += item.quantity;
+    const priceNum = parsePrice(item.price);
+    const itemTotal = priceNum * item.quantity;
+    total += itemTotal;
+    const summaryItem = document.createElement("div");
+    summaryItem.className = "summary-item";
+    summaryItem.innerHTML = `
+      <span>${item.id} (×${item.quantity})</span>
+      <span>${itemTotal.toLocaleString()} ج.م</span>
+    `;
+    orderSummary.appendChild(summaryItem);
+  });
+  const totalEl = document.createElement("div");
+  totalEl.className = "summary-item";
+  totalEl.style.fontWeight = "bold";
+  totalEl.style.marginTop = "0.5rem";
+  totalEl.style.borderTop = "1px solid #ddd";
+  totalEl.style.paddingTop = "0.5rem";
+  totalEl.innerHTML = `
+    <span>الإجمالي</span>
+    <span>${total.toLocaleString()} ج.م</span>
+  `;
+  orderSummary.appendChild(totalEl);
+  document.getElementById("orderQuantity").value = totalQty;
+};
+
+checkoutForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = document.getElementById("userName").value;
+  const address = document.getElementById("userAddress").value;
+  const phone = document.getElementById("userPhone").value;
+  const qty = document.getElementById("orderQuantity").value;
+  const phone2 = document.getElementById("userPhone2").value;
+  const notes = document.getElementById("orderNotes").value;
+
+  let itemsText = cart.map(item => `- ${item.id}: ${item.quantity} قطعة (${item.price})`).join("\n");
+  let total = cart.reduce((sum, item) => sum + (parsePrice(item.price) * item.quantity), 0);
+
+  const message = `طلب جديد من الموقع:
+--------------------------
+الاسم: ${name}
+العنوان: ${address}
+التليفون: ${phone}
+الكمية الإجمالية: ${qty}
+${phone2 ? `تليفون إضافي: ${phone2}` : ""}
+--------------------------
+المنتجات:
+${itemsText}
+--------------------------
+الإجمالي: ${total.toLocaleString()} ج.م
+${notes ? `\nملاحظات: ${notes}` : ""}
+`;
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, "_blank");
+  
+  // Clear cart after order
+  cart = [];
+  updateCartUI();
+  checkoutModal.classList.remove("open");
+  document.body.style.overflow = "";
+  alert("تم إرسال طلبك بنجاح عبر واتساب!");
+});
+
 // Modal event listeners
-modal.addEventListener("click", (event) => {
-  if (event.target.dataset.close) {
-    closeModal();
-  }
+[modal, checkoutModal].forEach(m => {
+  m.addEventListener("click", (event) => {
+    if (event.target.dataset.close) {
+      m.classList.remove("open");
+      m.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+  });
 });
 
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && modal.classList.contains("open")) {
+  if (event.key === "Escape") {
     closeModal();
+    checkoutModal.classList.remove("open");
+    closeCart();
   }
 });
 
 searchInput.addEventListener("input", applyFilters);
 sortSelect.addEventListener("change", applyFilters);
 
-// Smooth scroll behavior for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    const href = this.getAttribute('href');
-    if (href !== '#' && document.querySelector(href)) {
-      e.preventDefault();
-      const target = document.querySelector(href);
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
-
 // Load models from JSON
 fetch("models.json")
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
+  .then((response) => response.json())
   .then((data) => {
     models = data.map((model) => ({
       ...model,
@@ -192,24 +382,9 @@ fetch("models.json")
     }));
     filteredModels = [...models];
     renderModels(filteredModels);
+    updateCartUI();
   })
   .catch((error) => {
     console.error("Error loading models:", error);
-    modelsGrid.innerHTML =
-      '<p class="empty-state">تعذر تحميل الموديلات. الرجاء المحاولة لاحقًا.</p>';
+    modelsGrid.innerHTML = '<p class="empty-state">تعذر تحميل الموديلات. الرجاء المحاولة لاحقًا.</p>';
   });
-
-// Lazy loading optimization
-if ("IntersectionObserver" in window) {
-  const imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        img.src = img.dataset.src || img.src;
-        observer.unobserve(img);
-      }
-    });
-  });
-
-  document.querySelectorAll("img[data-src]").forEach(img => imageObserver.observe(img));
-}
