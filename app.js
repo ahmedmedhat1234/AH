@@ -6,7 +6,7 @@ const modalImage = document.getElementById("modalImage");
 const modalTitle = document.getElementById("modalTitle");
 const modalPrice = document.getElementById("modalPrice");
 const modalDesc = document.getElementById("modalDesc");
-const modalWhatsapp = document.getElementById("modalWhatsapp");
+const modalBuyNow = document.getElementById("modalBuyNow");
 const modalAddToCart = document.getElementById("modalAddToCart");
 
 const cartSidebar = document.getElementById("cartSidebar");
@@ -29,6 +29,8 @@ const DEFAULT_DESCRIPTION =
 let models = [];
 let filteredModels = [];
 let cart = JSON.parse(localStorage.getItem("ah_cart")) || [];
+let currentCheckoutMode = "cart"; // "cart" or "direct"
+let directPurchaseModel = null;
 
 const parsePrice = (price) => {
   const numeric = price.replace(/[^0-9]/g, "");
@@ -165,9 +167,9 @@ const renderModels = (data) => {
           ${oldPriceHtml}
         </div>
         <div class="model-actions">
-          <button class="btn btn-primary" data-action="add-to-cart" aria-label="إضافة ${model.id} للسلة">
-            <i class="fas fa-cart-plus"></i>
-            للسلة
+          <button class="btn btn-primary" data-action="buy-now" aria-label="شراء ${model.id} الآن">
+            <i class="fab fa-whatsapp"></i>
+            شراء
           </button>
           <button class="btn btn-outline" data-action="details" aria-label="عرض تفاصيل ${model.id}">
             <i class="fas fa-eye"></i>
@@ -182,9 +184,14 @@ const renderModels = (data) => {
       openModal(model);
     });
 
-    card.querySelector('[data-action="add-to-cart"]').addEventListener("click", (e) => {
+    card.querySelector('[data-action="buy-now"]').addEventListener("click", (e) => {
       e.stopPropagation();
-      addToCart(model);
+      directPurchaseModel = model;
+      currentCheckoutMode = "direct";
+      renderOrderSummary();
+      checkoutModal.classList.add("open");
+      checkoutModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
     });
 
     card.addEventListener("click", (e) => {
@@ -228,16 +235,23 @@ const openModal = (model) => {
   const originalPriceHtml = model.originalPrice ? `<span class="modal-original-price">${model.originalPrice}</span>` : '';
   modalPrice.innerHTML = `${model.price} ${originalPriceHtml}`;
   modalDesc.textContent = model.description || DEFAULT_DESCRIPTION;
-  modalWhatsapp.href = createWhatsappLink(model);
-  modalWhatsapp.setAttribute("aria-label", `شراء ${model.id} الآن عبر واتساب`);
-  
-  // Update Add to Cart button in modal
-  const newAddToCart = modalAddToCart.cloneNode(true);
-  modalAddToCart.parentNode.replaceChild(newAddToCart, modalAddToCart);
-  newAddToCart.addEventListener("click", () => {
+
+  // Update Buy Now button
+  modalBuyNow.onclick = () => {
+    directPurchaseModel = model;
+    currentCheckoutMode = "direct";
+    closeModal();
+    renderOrderSummary();
+    checkoutModal.classList.add("open");
+    checkoutModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  // Update Add to Cart button
+  modalAddToCart.onclick = () => {
     addToCart(model);
     closeModal();
-  });
+  };
 
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
@@ -275,6 +289,7 @@ cartClose.addEventListener("click", closeCart);
 
 checkoutBtn.addEventListener("click", () => {
   closeCart();
+  currentCheckoutMode = "cart";
   renderOrderSummary();
   checkoutModal.classList.add("open");
   checkoutModal.setAttribute("aria-hidden", "false");
@@ -285,11 +300,31 @@ const renderOrderSummary = () => {
   orderSummary.innerHTML = "<h4>ملخص الطلب</h4>";
   let total = 0;
   let totalQty = 0;
-  cart.forEach((item) => {
-    totalQty += item.quantity;
+  let itemsToDisplay = [];
+
+  if (currentCheckoutMode === "direct" && directPurchaseModel) {
+    // Direct purchase mode
+    const priceNum = parsePrice(directPurchaseModel.price);
+    total = priceNum;
+    totalQty = 1;
+    itemsToDisplay = [{
+      id: directPurchaseModel.id,
+      price: directPurchaseModel.price,
+      quantity: 1
+    }];
+  } else {
+    // Cart mode
+    itemsToDisplay = cart;
+    cart.forEach((item) => {
+      totalQty += item.quantity;
+      const priceNum = parsePrice(item.price);
+      total += priceNum * item.quantity;
+    });
+  }
+
+  itemsToDisplay.forEach((item) => {
     const priceNum = parsePrice(item.price);
     const itemTotal = priceNum * item.quantity;
-    total += itemTotal;
     const summaryItem = document.createElement("div");
     summaryItem.className = "summary-item";
     summaryItem.innerHTML = `
@@ -298,6 +333,7 @@ const renderOrderSummary = () => {
     `;
     orderSummary.appendChild(summaryItem);
   });
+
   const totalEl = document.createElement("div");
   totalEl.className = "summary-item";
   totalEl.style.fontWeight = "bold";
@@ -321,8 +357,19 @@ checkoutForm.addEventListener("submit", (e) => {
   const phone2 = document.getElementById("userPhone2").value;
   const notes = document.getElementById("orderNotes").value;
 
-  let itemsText = cart.map(item => `- ${item.id}: ${item.quantity} قطعة (${item.price})`).join("\n");
-  let total = cart.reduce((sum, item) => sum + (parsePrice(item.price) * item.quantity), 0);
+  let itemsText = "";
+  let total = 0;
+
+  if (currentCheckoutMode === "direct" && directPurchaseModel) {
+    // Direct purchase
+    const priceNum = parsePrice(directPurchaseModel.price);
+    total = priceNum;
+    itemsText = `- ${directPurchaseModel.id}: 1 قطعة (${directPurchaseModel.price})`;
+  } else {
+    // Cart purchase
+    itemsText = cart.map(item => `- ${item.id}: ${item.quantity} قطعة (${item.price})`).join("\n");
+    total = cart.reduce((sum, item) => sum + (parsePrice(item.price) * item.quantity), 0);
+  }
 
   const message = `طلب جديد من الموقع:
 --------------------------
@@ -342,9 +389,14 @@ ${notes ? `\nملاحظات: ${notes}` : ""}
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, "_blank");
   
-  // Clear cart after order
-  cart = [];
-  updateCartUI();
+  // Clear cart after order if it was a cart purchase
+  if (currentCheckoutMode === "cart") {
+    cart = [];
+    updateCartUI();
+  }
+  
+  // Clear form
+  checkoutForm.reset();
   checkoutModal.classList.remove("open");
   document.body.style.overflow = "";
   alert("تم إرسال طلبك بنجاح عبر واتساب!");
